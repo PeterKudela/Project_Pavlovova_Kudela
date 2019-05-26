@@ -6,14 +6,15 @@ from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.graph_objs as go
 import pycountry
+import requests
 
 countries = {}
 for country in pycountry.countries:
     countries[country.name] = country.alpha_2.lower()
 available_indicators = countries.keys()
 
-def getData(charcteristics,Country):
-    url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries[Country]+'&data=' +charcteristics+'&years=1990:2016'
+def getData(charcteristics,country):
+    url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries[country]+'&data=' +charcteristics+'&years=1990:2016'
     return requests.get(url).json()
 
 
@@ -28,52 +29,64 @@ app.layout = html.Div([
     dcc.Dropdown(id='country',
      options=[{'label': i, 'value': i} for i in available_indicators],
      value=' '),
-     html.Div(id='my-div')
+     html.Div(id='visit')
      ],
      style={'width': '49%', 'display': 'inline-block'}),
-     dcc.Graph(id='indicator-graphic')
+
+     html.Div([
+        dcc.Graph(
+            id='indicator-graphic')
+    ], style={'width': '49%'})
      ])
 
 
 @app.callback(
-    [Output(component_id='my-div', component_property='children'),
-    Output('indicator-graphic', 'figure')],
-    [Input(component_id='country', component_property='value')]
-)
-def update_output_div(country):
-    return 'TOP places to visit in {}:'.format(country)
+    dash.dependencies.Output(component_id='visit', component_property='children'),
+    [dash.dependencies.Input(component_id='country', component_property='value')])
+
+def update_output_div(input):
+    return 'TOP places to visit in {}:'.format(input)
+
+@app.callback(
+    dash.dependencies.Output(component_id='indicator-graphic', component_property='figure'),
+    [dash.dependencies.Input(component_id='country', component_property='value')])
 
 def update_graph(country):
     data = getData('population',country)
-    years = []
-    population = []
-    for i in data[0]['population']:
-        years.append(int(i['year']))
-    for j in data[0]['population']:
-        population.append(int(i['data']))
+    years=[]
+    popul= []
+    if data != {'type': 'error', 'msg': 'Invalid data argument.'}:
+        for i in data[0]['population']:
+            years.append(int(i['year']))
+            popul.append(int(i['data']))
+        title_graph = "Population"
+    else:
+        years = list(range(1990,2017))
+        popul = [0]*27
+        title_graph = 'Population - DATA NOT AVAILABLE'
     return {
         'data': [go.Scatter(
-            x=years,
-            y=population,
-            text=Country,
-            mode='markers',
-            marker={
-                'size': 15,
-                'opacity': 0.5,
-                'line': {'width': 0.5, 'color': 'white'}
-            }
-        )],
-        'layout': go.Layout(
-            xaxis={
-                'title': 'Years'
-            },
-            yaxis={
-                'title': 'Population',
-            },
-            margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
-            hovermode='closest'
-        )
-    }
+                x=years,
+                y=popul,
+                mode='lines+markers',
+                marker={
+                    'size': 10,
+                    'opacity': 0.5,
+                    'line': {'width': 0.5, 'color': 'blue'}
+                    }
+                    )],
+                'layout': go.Layout(
+                    xaxis={
+                        'title': 'Years'
+                    },
+                    yaxis={
+                        'title': 'Population',
+                        },
+                    title = title_graph,
+                    margin={'l': 60, 'b': 30, 't': 30, 'r': 30},
+                    hovermode='closest'
+                        )
+                        }
 
 
 if __name__ == '__main__':
