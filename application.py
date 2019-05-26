@@ -7,6 +7,9 @@ import pandas as pd
 import plotly.graph_objs as go
 import pycountry
 import requests
+import json
+
+
 
 countries = {}
 for country in pycountry.countries:
@@ -14,9 +17,16 @@ for country in pycountry.countries:
 available_indicators = countries.keys()
 
 def getData(charcteristics,country):
-    if country in countries.keys():
-        url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries.get(country)+'&data=' +charcteristics+'&years=1990:2016'
-        return requests.get(url).json()
+    url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries.get(country)+'&data=' +charcteristics+'&years=1990:2016'
+    return requests.get(url).json()
+
+with open('Tripadvisor.json', 'r') as f:
+        datastore = json.load(f)
+datastore
+
+attractions = {}
+for country in datastore:
+    attractions[country['country']]=country['attractions']
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -29,7 +39,7 @@ app.layout = html.Div([
     html.Label('Select country:'),
     dcc.Dropdown(id='country',
      options=[{'label': i, 'value': i} for i in available_indicators],
-     value=' '),
+     value='Czechia'),
      html.Div(id='visit')
      ],
      style={'width': '49%', 'display': 'inline-block'}),
@@ -46,7 +56,11 @@ app.layout = html.Div([
     [dash.dependencies.Input(component_id='country', component_property='value')])
 
 def update_output_div(input):
-    return 'TOP places to visit in {}:'.format(input)
+    if attractions[input][0:11] is not None:
+        to_visit =attractions[input][0:11]
+    else:
+        to_visit = 'No data available. :('
+    return 'TOP places to visit in {}: {}'.format(input,to_visit)
 
 @app.callback(
     dash.dependencies.Output(component_id='indicator-graphic', component_property='figure'),
@@ -56,7 +70,7 @@ def update_graph(country):
     data = getData('population',country)
     years=[]
     popul= []
-    if data is not None:
+    if data != {'type': 'error', 'msg': 'Invalid data argument.'}:
         for i in data[0]['population']:
             years.append(int(i['year']))
             popul.append(int(i['data']))
