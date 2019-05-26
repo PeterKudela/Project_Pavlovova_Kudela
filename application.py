@@ -14,8 +14,9 @@ for country in pycountry.countries:
 available_indicators = countries.keys()
 
 def getData(charcteristics,country):
-    url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries[country]+'&data=' +charcteristics+'&years=1990:2016'
-    return requests.get(url).json()
+    if country in countries.keys():
+        url = 'http://inqstatsapi.inqubu.com?api_key=c5b5c1dd6b0f4ea5&countries='+countries.get(country)+'&data=' +charcteristics+'&years=1990:2016'
+        return requests.get(url).json()
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -55,7 +56,7 @@ def update_graph(country):
     data = getData('population',country)
     years=[]
     popul= []
-    if data != {'type': 'error', 'msg': 'Invalid data argument.'}:
+    if data is not None:
         for i in data[0]['population']:
             years.append(int(i['year']))
             popul.append(int(i['data']))
