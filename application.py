@@ -57,8 +57,9 @@ app.layout = html.Div([
                            max=2016,
                            value=2016,
                            marks={i: {'label': str(i)} for i in range(1990,2017)},
-                               included=False)],style={'width': '49%','float':'right'})
-                               ])])
+                               included=False)],
+                style={'width': '49%','float':'right'})])
+])
 
 
 
