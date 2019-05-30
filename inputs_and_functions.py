@@ -3,6 +3,7 @@ import plotly.graph_objs as go
 import pycountry
 import requests
 import json
+import numpy as np
 
 countries = {}
 for country in pycountry.countries:
@@ -85,11 +86,19 @@ def scatter(country,characteristic):
                         }
 def world_map(characteristic,year):
     df=pd.read_json(json.dumps(getDataWorld(characteristic,str(year))))
-
-    trace = go.Choropleth(locations=df['countryName'],z=df[characteristic],text = df['countryName'],
+    if len(df) != 0 :
+        return {"data":[go.Choropleth(locations=df['countryName'],z=df[characteristic],text = df['countryName'],
                             autocolorscale=False, locationmode = 'country names',
                             colorscale = "YlGnBu", marker = {'line':{'color':'rgb(180,180,180)','width':0.5}},
                             colorbar={"thickness": 10,"len": 0.3,"x": 0.1,"y": 0.2,
-                                    'title': {"text": characteristic, "side": "bottom"}})
-    return {"data": [trace],
-            "layout": go.Layout(height=500,margin=go.layout.Margin(l=0,r=0,b=0,t=0,pad=4),geo={'showframe': False,'showcoastlines': True,'projection': {'type': "miller"}})}
+                                    'title': {"text": characteristic, "side": "bottom"}})],
+                "layout":go.Layout(height=500,
+                        margin=go.layout.Margin(l=0,r=0,b=0,t=0,pad=4),geo={'showframe': False,'showcoastlines': True,'projection': {'type': "miller"}})}
+    else:
+        return {"data":[go.Choropleth(locations=list(countries.keys()),z=np.zeros(len(list(countries.keys()))),
+                            autocolorscale=True, locationmode = 'country names',
+                            colorbar={"thickness": 0.1,"len": 0.3,"x": 0.1,"y": 0.2,
+                                    'title': {"text": characteristic, "side": "bottom"}})],
+                "layout":go.Layout(height=500, title = go.layout.Title(
+        text = 'NO DATA'),
+                        margin=go.layout.Margin(l=0,r=0,b=0,t=30,pad=4),geo={'showframe': False,'showcoastlines': True,'projection': {'type': "miller"}})}
