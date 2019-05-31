@@ -59,7 +59,7 @@ def getData(characteristic,country):
 
 def getDataWorld(charcteristics,year):
     '''
-        For given inqbu charcteristic code and year(as a string) returns the data
+        For given inqbu characteristic code and year(as a string) returns the data
         for the whole world.
     '''
     url = 'http://inqstatsapi.inqubu.com?api_key=05305ba459195d25&cmd=getWorldData&data=' +charcteristics+'&year='+year
