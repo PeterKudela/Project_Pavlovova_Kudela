@@ -38,12 +38,12 @@ def getTripAdvisorLink(country):
         Google is used as it is able to obtain specific code needed in Tripadvisor link which returns a country
         Example: g274684 for Czech Republic
     '''
-    soup = getSoup('https://www.google.com/search?q=tripadvisor+best+things+to+do+in+'+str(country))
-    ta = 'http://tripadvisor.com/Attractions'
+    soup = getSoup('https://www.google.com/search?q=tripadvisor+best+things+to+do+in+'+str(country)) #create soup from google output page
+    ta = 'http://tripadvisor.com/Attractions' #first part of tripadvisor attractions link which is same for all countries
     i = 0
-    length = len(soup.findAll('a',href=True))
-    while True:
-        url=soup.findAll('a',href=True)[i].get('href').partition("Attractions")[2].partition(".html")[0]
+    length = len(soup.findAll('a',href=True)) #finds all a hyperlinks on the first page of google output (should contain tripadvisor link as search is used with Tripadvisor keyword in it)
+    while True: #loop that goes through hyperlinks and if code for country is find it stops
+        url=soup.findAll('a',href=True)[i].get('href').partition("Attractions")[2].partition(".html")[0] #finds Tripadvisor link on the google output page and extracts the part with code and country (g274684-Czechia)
         i+=1
         adress = ta+url
         if adress !=  ta:
@@ -58,9 +58,9 @@ def getTripAdvisorAttractions(link):
     '''
     if link is not None:
         soup = getSoup(link)
-        divs = soup.findAll('div', {'class':'listing_title'})
-        text_chunks = {div.contents[1] for div in divs}
-        attraction_titles=[title.contents[0] for title in text_chunks]
+        divs = soup.findAll('div', {'class':'listing_title'}) #goes through all section with class listing_title
+        text_chunks = {div.contents[1] for div in divs} #creates dictionary of second content of division for each division
+        attraction_titles=[title.contents[0] for title in text_chunks] #creates list of first content (of the second content of each divission) which is the title of attraction
         return attraction_titles
 
 '''
