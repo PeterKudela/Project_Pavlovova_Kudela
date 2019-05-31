@@ -1,7 +1,7 @@
 '''
     Web scraper that gets TOP things to visit in every country
-    based on Tripadvisor rating. We get the tripadvisor websides
-    special tripadvisor country codes are needed. As we did not find
+    based on TripAdvisor rating. We get the TripAdvisor websites
+    special TripAdvisor country codes are needed. As we did not find
     any list of them, we went around using google. The scraper first
     googles top places to visit in country x - gets the corresponding
     link and then scrapes the corresponding page.
