@@ -1,10 +1,10 @@
 # Project
 
-##Project summary
+## Project summary
 
 To run the project, just run $ python application.py in your terminal and then open http://127.0.0.1:8050/ in your browser.
 
-##Project data
+## Project data
 We worked with two sources of data (see inputs_and_functions.py). The first publicly available inqubu API which provides various demographic, economical variables. Second, TripAdvisor.json file which was created using sraper.py to obtain list of "best things to do" in each country
 
 ## application.py
